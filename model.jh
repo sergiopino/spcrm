@@ -1,0 +1,191 @@
+application {
+  config {
+      databaseType sql
+      devDatabaseType h2Disk
+      enableHibernateCache true
+      enableSwaggerCodegen false
+      enableTranslation true
+      jhiPrefix jhi
+      languages [en, fr]
+      messageBroker false
+      nativeLanguage en
+      packageName com.sergiopino
+      prodDatabaseType mysql
+      searchEngine false
+      skipClient false
+      skipServer false
+      testFrameworks []
+      websocket false
+      applicationType gateway
+      baseName spcrm
+      serverPort 8080
+      authenticationType jwt
+      cacheProvider ehcache
+      buildTool maven
+      useSass true
+      clientPackageManager npm
+      clientFramework angularX
+      skipUserManagement false
+	}
+    entities * 
+}
+
+entity Region {
+	regionName String
+}
+
+entity Country {
+	countryName String
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity Location {
+	streetAddress String,
+	postalCode String,
+	city String,
+	stateProvince String
+}
+
+entity Department {
+	departmentName String required
+}
+
+/**
+ * Task entity.
+ * @author The JHipster team.
+ */
+entity Task {
+	title String,
+	description String
+}
+
+/**
+ * The Employee entity.
+ */
+entity Employee {
+	/**
+	* The firstname attribute.
+	*/
+	firstName String,
+	lastName String,
+	email String,
+	phoneNumber String,
+	hireDate Instant,
+	salary Long,
+	commissionPct Long
+}
+
+/**
+ * The Objective entity.
+ */
+entity Objective {
+	/**
+	* The firstname attribute.
+	*/
+	name String,
+	dueDate Instant,
+    priority Priority
+}
+
+/**
+ * The Objective entity.
+ */
+entity Blog {
+	/**
+	* The firstname attribute.
+	*/
+	name String,
+	publishDate Instant,
+    comment Comments
+}
+
+entity Comments {
+	comment String
+}
+
+entity Job {
+	jobTitle String,
+	minSalary Long,
+	maxSalary Long
+}
+
+entity JobHistory {
+	startDate Instant,
+	endDate Instant,
+	language Language
+}
+
+enum Priority {
+    HIGH, MEDIUM, LOW
+}
+
+
+enum Language {
+    FRENCH, ENGLISH, SPANISH
+}
+
+relationship OneToOne {
+	Country{region} to Region
+}
+
+relationship OneToOne {
+	Location{country} to Country
+}
+
+relationship OneToOne {
+	Department{location} to Location
+}
+
+relationship ManyToMany {
+	Job{task(title)} to Task{job}
+}
+
+
+relationship ManyToOne {
+  Blog{user(login)} to User
+  Post{blog(name)} to Blog
+}
+
+relationship ManyToMany {
+  Post{tag(name)} to Tag{entry}
+}
+
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Employee{job} to Job,
+	Employee{Objective} to Objective,
+	/**
+	* A relationship
+	*/
+	Department{employee} to
+	/**
+	* Another side of the same relationship
+	*/
+	Employee
+}
+
+relationship ManyToOne {
+	Employee{manager} to Employee
+}
+
+// defining multiple oneToOne relationships
+relationship OneToOne {
+	JobHistory{job} to Job,
+	JobHistory{department} to Department,
+	JobHistory{employee} to Employee
+}
+
+// Set pagination options
+paginate JobHistory, Employee with infinite-scroll
+paginate Job with pagination
+
+// Use Data Transfert Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Employee, Job
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
